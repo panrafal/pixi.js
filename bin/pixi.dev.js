@@ -4,7 +4,7 @@
  * Copyright (c) 2012-2014, Mat Groves
  * http://goodboydigital.com/
  *
- * Compiled: 2014-05-06
+ * Compiled: 2014-05-07
  *
  * pixi.js is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -5299,24 +5299,24 @@ PIXI.WebGLRenderer = function(width, height, view, transparent, antialias)
     this.options = {
         alpha: this.transparent,
         antialias:!!antialias, // SPEED UP??
-        premultipliedAlpha:!!transparent,
+        premultipliedAlpha:!!transparent && transparent !== 'notMultiplied',
         stencil:true
     };
 
-    //try 'experimental-webgl'
-    try {
-        this.gl = this.view.getContext('experimental-webgl',  this.options);
-    } catch (e) {
-        //try 'webgl'
+    var gl = null;
+
+    ['experimental-webgl', 'webgl'].forEach(function(name) {
         try {
-            this.gl = this.view.getContext('webgl',  this.options);
-        } catch (e2) {
-            // fail, not able to get a context
-            throw new Error(' This browser does not support webGL. Try using the canvas renderer' + this);
-        }
+            gl = this.view.getContext(name,  this.options);
+        } catch(e) {}
+    }, this);
+
+    if (!gl) {
+        // fail, not able to get a context
+        throw new Error('This browser does not support webGL. Try using the canvas renderer' + this);
     }
 
-    var gl = this.gl;
+    this.gl = gl;
     this.glContextId = gl.id = PIXI.WebGLRenderer.glContextId ++;
 
     PIXI.glContexts[this.glContextId] = gl;
@@ -8257,6 +8257,7 @@ PIXI.BaseTexture.prototype.destroy = function()
     if(this.imageUrl)
     {
         delete PIXI.BaseTextureCache[this.imageUrl];
+        delete PIXI.TextureCache[this.imageUrl];
         this.imageUrl = null;
         this.source.src = null;
     }

@@ -4,7 +4,7 @@
  * Copyright (c) 2012-2014, Mat Groves
  * http://goodboydigital.com/
  *
- * Compiled: 2014-05-07
+ * Compiled: 2014-05-10
  *
  * pixi.js is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -5307,7 +5307,7 @@ PIXI.WebGLRenderer = function(width, height, view, transparent, antialias)
 
     ['experimental-webgl', 'webgl'].forEach(function(name) {
         try {
-            gl = this.view.getContext(name,  this.options);
+            gl = gl || this.view.getContext(name,  this.options);
         } catch(e) {}
     }, this);
 
